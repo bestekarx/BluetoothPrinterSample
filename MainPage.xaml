@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+  x:Class="BluetoothPrinterSample.MainPage"
+  xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  Title="Bluetooth Printer Sample"
+  BackgroundColor="{AppThemeBinding Light=#F5F5F5,
+                                    Dark=#1F1F1F}">
+
+  <ScrollView>
+    <VerticalStackLayout
+      Padding="20"
+      Spacing="20"
+      VerticalOptions="Start">
+
+      <!--  Header  -->
+      <Frame
+        Margin="0,10"
+        Padding="20"
+        BackgroundColor="{AppThemeBinding Light=#512BD4,
+                                          Dark=#7B68EE}"
+        CornerRadius="15">
+        <VerticalStackLayout Spacing="10">
+          <Label
+            FontAttributes="Bold"
+            FontSize="24"
+            HorizontalOptions="Center"
+            SemanticProperties.HeadingLevel="Level1"
+            Text="🖨️ Bluetooth Printer Sample"
+            TextColor="White" />
+          <Label
+            FontSize="14"
+            HorizontalOptions="Center"
+            Text="Connect to ESC/POS and Zebra printers"
+            TextColor="White" />
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Bluetooth Status  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="📶 Bluetooth Status"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label
+              x:Name="BluetoothStatusLabel"
+              FontSize="16"
+              Text="Checking..."
+              VerticalOptions="Center" />
+            <Button
+              x:Name="CheckBluetoothButton"
+              Padding="15,8"
+              BackgroundColor="#512BD4"
+              Clicked="OnCheckBluetoothClicked"
+              CornerRadius="8"
+              Text="🔄 Refresh"
+              TextColor="White" />
+          </HorizontalStackLayout>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Device Scanning  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="🔍 Device Scanning"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          <Button
+            x:Name="ScanButton"
+            Padding="15,10"
+            BackgroundColor="#28A745"
+            Clicked="OnScanClicked"
+            CornerRadius="8"
+            Text="🔍 Scan for Devices"
+            TextColor="White" />
+          <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <ActivityIndicator
+              x:Name="ScanIndicator"
+              IsRunning="False"
+              IsVisible="False"
+              Color="#512BD4" />
+            <Label
+              x:Name="ScanStatusLabel"
+              FontSize="14"
+              Text=""
+              TextColor="{AppThemeBinding Light=#666666,
+                                          Dark=#CCCCCC}"
+              VerticalOptions="Center" />
+          </HorizontalStackLayout>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Device List  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="📱 Discovered Devices"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          <CollectionView
+            x:Name="DevicesCollectionView"
+            BackgroundColor="Transparent"
+            HeightRequest="250">
+            <CollectionView.ItemTemplate>
+              <DataTemplate>
+                <Frame
+                  Margin="0,5"
+                  Padding="15"
+                  BackgroundColor="{AppThemeBinding Light=#F8F9FA,
+                                                    Dark=#3D3D3D}"
+                  BorderColor="{AppThemeBinding Light=#DEE2E6,
+                                                Dark=#555555}"
+                  CornerRadius="8">
+                  <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto">
+                    <VerticalStackLayout
+                      Grid.Row="0"
+                      Grid.Column="0"
+                      Spacing="5">
+                      <Label
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Text="{Binding Name}"
+                        TextColor="{AppThemeBinding Light=#333333,
+                                                    Dark=#FFFFFF}" />
+                      <Label
+                        FontSize="12"
+                        Text="{Binding Address}"
+                        TextColor="{AppThemeBinding Light=#666666,
+                                                    Dark=#CCCCCC}" />
+                    </VerticalStackLayout>
+                    <Label
+                      Grid.Row="1"
+                      Grid.Column="0"
+                      FontAttributes="Italic"
+                      FontSize="12"
+                      Text="{Binding PrinterType}"
+                      TextColor="#512BD4" />
+                    <Button
+                      Grid.RowSpan="2"
+                      Grid.Column="1"
+                      Padding="12,8"
+                      BackgroundColor="#007BFF"
+                      Clicked="OnDeviceConnectClicked"
+                      CommandParameter="{Binding .}"
+                      CornerRadius="6"
+                      Text="🔗 Connect"
+                      TextColor="White"
+                      VerticalOptions="Center" />
+                  </Grid>
+                </Frame>
+              </DataTemplate>
+            </CollectionView.ItemTemplate>
+          </CollectionView>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Connection Status  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="🔌 Connection Status"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          <VerticalStackLayout Spacing="8">
+            <Label
+              x:Name="ConnectionStatusLabel"
+              FontSize="16"
+              Text="Disconnected"
+              TextColor="Red" />
+            <Label
+              x:Name="ConnectedDeviceLabel"
+              FontSize="14"
+              Text="No device connected"
+              TextColor="{AppThemeBinding Light=#666666,
+                                          Dark=#CCCCCC}" />
+            <Button
+              x:Name="DisconnectButton"
+              Padding="15,8"
+              BackgroundColor="#DC3545"
+              Clicked="OnDisconnectClicked"
+              CornerRadius="8"
+              IsEnabled="False"
+              Text="🔌 Disconnect"
+              TextColor="White" />
+          </VerticalStackLayout>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Print Input Section  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="📝 Print Input"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          
+          <!-- Text Input -->
+          <VerticalStackLayout Spacing="5">
+            <Label
+              FontSize="14"
+              Text="Text to Print:"
+              TextColor="{AppThemeBinding Light=#333333,
+                                          Dark=#FFFFFF}" />
+            <Entry
+              x:Name="PrintTextEntry"
+              Placeholder="Enter text to print..."
+              Text="Hello World!" />
+          </VerticalStackLayout>
+
+          <!-- Barcode Input -->
+          <VerticalStackLayout Spacing="5">
+            <Label
+              FontSize="14"
+              Text="Barcode Data:"
+              TextColor="{AppThemeBinding Light=#333333,
+                                          Dark=#FFFFFF}" />
+            <Entry
+              x:Name="BarcodeEntry"
+              Placeholder="Enter barcode data..."
+              Text="123456789" />
+          </VerticalStackLayout>
+
+          <!-- QR Code Input -->
+          <VerticalStackLayout Spacing="5">
+            <Label
+              FontSize="14"
+              Text="QR Code Data:"
+              TextColor="{AppThemeBinding Light=#333333,
+                                          Dark=#FFFFFF}" />
+            <Entry
+              x:Name="QrCodeEntry"
+              Placeholder="Enter QR code data..."
+              Text="https://example.com" />
+          </VerticalStackLayout>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Print Actions  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="🖨️ Print Actions"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+          
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+            <!-- Row 1 -->
+            <Button
+              x:Name="PrintTextButton"
+              Grid.Row="0"
+              Grid.Column="0"
+              Padding="10,8"
+              BackgroundColor="#007BFF"
+              Clicked="OnPrintTextClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="🖨️ Print Text"
+              TextColor="White" />
+            
+            <Button
+              x:Name="PrintBarcodeButton"
+              Grid.Row="0"
+              Grid.Column="1"
+              Padding="10,8"
+              BackgroundColor="#28A745"
+              Clicked="OnPrintBarcodeClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="📊 Print Barcode"
+              TextColor="White" />
+
+            <!-- Row 2 -->
+            <Button
+              x:Name="PrintQrCodeButton"
+              Grid.Row="1"
+              Grid.Column="0"
+              Padding="10,8"
+              BackgroundColor="#FFC107"
+              Clicked="OnPrintQrCodeClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="📱 Print QR Code"
+              TextColor="Black" />
+            
+            <Button
+              x:Name="PrintReceiptButton"
+              Grid.Row="1"
+              Grid.Column="1"
+              Padding="10,8"
+              BackgroundColor="#17A2B8"
+              Clicked="OnPrintReceiptClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="🧾 Print Receipt"
+              TextColor="White" />
+
+            <!-- Row 3 -->
+            <Button
+              x:Name="PrintTestLabelButton"
+              Grid.Row="2"
+              Grid.Column="0"
+              Padding="10,8"
+              BackgroundColor="#6F42C1"
+              Clicked="OnPrintTestLabelClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="🧪 Print Test"
+              TextColor="White" />
+            
+            <Button
+              x:Name="CutPaperButton"
+              Grid.Row="2"
+              Grid.Column="1"
+              Padding="10,8"
+              BackgroundColor="#FD7E14"
+              Clicked="OnCutPaperClicked"
+              CornerRadius="6"
+              IsEnabled="False"
+              Text="✂️ Cut Paper"
+              TextColor="White" />
+          </Grid>
+
+          <!-- Printer Status Button -->
+          <Button
+            x:Name="GetStatusButton"
+            Padding="15,8"
+            BackgroundColor="#6C757D"
+            Clicked="OnGetPrinterStatusClicked"
+            CornerRadius="8"
+            IsEnabled="False"
+            Text="📊 Get Printer Status"
+            TextColor="White" />
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Log Section  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,
+                                          Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,
+                                      Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label
+              FontAttributes="Bold"
+              FontSize="18"
+              Text="📋 Activity Log"
+              TextColor="{AppThemeBinding Light=#333333,
+                                          Dark=#FFFFFF}"
+              VerticalOptions="Center" />
+            <Button
+              x:Name="ClearLogButton"
+              Padding="8,4"
+              BackgroundColor="#6C757D"
+              Clicked="OnClearLogClicked"
+              CornerRadius="4"
+              Text="🗑️ Clear"
+              TextColor="White" />
+          </HorizontalStackLayout>
+          <Editor
+            x:Name="LogEditor"
+            BackgroundColor="{AppThemeBinding Light=#F8F9FA,
+                                              Dark=#3D3D3D}"
+            FontFamily="Monospace"
+            FontSize="12"
+            HeightRequest="200"
+            IsReadOnly="True"
+            Text="Bluetooth Printer Sample App Started...&#x0a;"
+            TextColor="{AppThemeBinding Light=#333333,
+                                        Dark=#FFFFFF}" />
+        </VerticalStackLayout>
+      </Frame>
+
+    </VerticalStackLayout>
+  </ScrollView>
+
+</ContentPage> 
