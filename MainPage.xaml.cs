@@ -61,7 +61,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Error checking Bluetooth: {ex.Message}");
+            LogMessage($"[EXCEPTION] Error checking Bluetooth: {ex.Message}");
             await DisplayAlert("Error", $"Failed to check Bluetooth status: {ex.Message}", "OK");
         }
     }
@@ -119,7 +119,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Scan error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Scan error: {ex.Message}");
             ScanStatusLabel.Text = "Scan failed";
             await DisplayAlert("Scan Error", $"Failed to scan for devices: {ex.Message}", "OK");
         }
@@ -158,7 +158,7 @@ public partial class MainPage : ContentPage, IDisposable
             }
             catch (Exception ex)
             {
-                LogMessage($"Connection error: {ex.Message}");
+                LogMessage($"[EXCEPTION] Connection error: {ex.Message}");
                 await DisplayAlert("Connection Error", $"Error connecting to device: {ex.Message}", "OK");
             }
             finally
@@ -182,7 +182,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Disconnect error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Disconnect error: {ex.Message}");
             await DisplayAlert("Disconnect Error", $"Error disconnecting: {ex.Message}", "OK");
         }
         finally
@@ -232,7 +232,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Print text error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Print text error: {ex.Message}");
             await DisplayAlert("Print Error", $"Error printing text: {ex.Message}", "OK");
         }
         finally
@@ -282,7 +282,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Print barcode error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Print barcode error: {ex.Message}");
             await DisplayAlert("Print Error", $"Error printing barcode: {ex.Message}", "OK");
         }
         finally
@@ -332,7 +332,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Print QR code error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Print QR code error: {ex.Message}");
             await DisplayAlert("Print Error", $"Error printing QR code: {ex.Message}", "OK");
         }
         finally
@@ -493,7 +493,7 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Print receipt error: {ex.Message}");
+            LogMessage($"[EXCEPTION] Print receipt error: {ex.Message}");
             await DisplayAlert("Print Error", $"Error printing receipt: {ex.Message}", "OK");
         }
         finally
@@ -548,8 +548,8 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Test print error: {ex.Message}");
-            await DisplayAlert("Print Error", $"Error printing test: {ex.Message}", "OK");
+            LogMessage($"[EXCEPTION] Test print error: {ex.Message}");
+            await DisplayAlert("Test Print Error", $"Error printing test: {ex.Message}", "OK");
         }
         finally
         {
@@ -601,8 +601,8 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Cut paper error: {ex.Message}");
-            await DisplayAlert("Error", $"Error cutting paper: {ex.Message}", "OK");
+            LogMessage($"[EXCEPTION] Cut paper error: {ex.Message}");
+            await DisplayAlert("Cut Paper Error", $"Error cutting paper: {ex.Message}", "OK");
         }
         finally
         {
@@ -647,8 +647,8 @@ public partial class MainPage : ContentPage, IDisposable
         }
         catch (Exception ex)
         {
-            LogMessage($"Get status error: {ex.Message}");
-            await DisplayAlert("Error", $"Error getting printer status: {ex.Message}", "OK");
+            LogMessage($"[EXCEPTION] Get status error: {ex.Message}");
+            await DisplayAlert("Status Error", $"Error getting printer status: {ex.Message}", "OK");
         }
         finally
         {
