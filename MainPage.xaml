@@ -241,8 +241,8 @@
             Text="📝 Print Input"
             TextColor="{AppThemeBinding Light=#333333,
                                         Dark=#FFFFFF}" />
-          
-          <!-- Text Input -->
+
+          <!--  Text Input  -->
           <VerticalStackLayout Spacing="5">
             <Label
               FontSize="14"
@@ -255,7 +255,7 @@
               Text="Hello World!" />
           </VerticalStackLayout>
 
-          <!-- Barcode Input -->
+          <!--  Barcode Input  -->
           <VerticalStackLayout Spacing="5">
             <Label
               FontSize="14"
@@ -268,7 +268,7 @@
               Text="123456789" />
           </VerticalStackLayout>
 
-          <!-- QR Code Input -->
+          <!--  QR Code Input  -->
           <VerticalStackLayout Spacing="5">
             <Label
               FontSize="14"
@@ -299,9 +299,13 @@
             Text="🖨️ Print Actions"
             TextColor="{AppThemeBinding Light=#333333,
                                         Dark=#FFFFFF}" />
-          
-          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
-            <!-- Row 1 -->
+
+          <Grid
+            ColumnDefinitions="*,*"
+            ColumnSpacing="10"
+            RowDefinitions="Auto,Auto,Auto"
+            RowSpacing="10">
+            <!--  Row 1  -->
             <Button
               x:Name="PrintTextButton"
               Grid.Row="0"
@@ -313,7 +317,7 @@
               IsEnabled="False"
               Text="🖨️ Print Text"
               TextColor="White" />
-            
+
             <Button
               x:Name="PrintBarcodeButton"
               Grid.Row="0"
@@ -326,7 +330,7 @@
               Text="📊 Print Barcode"
               TextColor="White" />
 
-            <!-- Row 2 -->
+            <!--  Row 2  -->
             <Button
               x:Name="PrintQrCodeButton"
               Grid.Row="1"
@@ -338,7 +342,7 @@
               IsEnabled="False"
               Text="📱 Print QR Code"
               TextColor="Black" />
-            
+
             <Button
               x:Name="PrintReceiptButton"
               Grid.Row="1"
@@ -351,7 +355,7 @@
               Text="🧾 Print Receipt"
               TextColor="White" />
 
-            <!-- Row 3 -->
+            <!--  Row 3  -->
             <Button
               x:Name="PrintTestLabelButton"
               Grid.Row="2"
@@ -363,7 +367,7 @@
               IsEnabled="False"
               Text="🧪 Print Test"
               TextColor="White" />
-            
+
             <Button
               x:Name="CutPaperButton"
               Grid.Row="2"
@@ -377,7 +381,7 @@
               TextColor="White" />
           </Grid>
 
-          <!-- Printer Status Button -->
+          <!--  Printer Status Button  -->
           <Button
             x:Name="GetStatusButton"
             Padding="15,8"
@@ -387,6 +391,39 @@
             IsEnabled="False"
             Text="📊 Get Printer Status"
             TextColor="White" />
+        </VerticalStackLayout>
+      </Frame>
+
+      <!--  Print Settings  -->
+      <Frame
+        Margin="0,5"
+        Padding="15"
+        BackgroundColor="{AppThemeBinding Light=White,Dark=#2D2D2D}"
+        BorderColor="{AppThemeBinding Light=#E0E0E0,Dark=#404040}"
+        CornerRadius="10">
+        <VerticalStackLayout Spacing="12">
+          <Label
+            FontAttributes="Bold"
+            FontSize="18"
+            Text="⚙️ Print Settings"
+            TextColor="{AppThemeBinding Light=#333333,Dark=#FFFFFF}" />
+          <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto">
+            <Label Grid.Row="0" Grid.Column="0" Text="X:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="XEntry" Grid.Row="0" Grid.Column="1" Text="30" Keyboard="Numeric" WidthRequest="60" />
+            <Label Grid.Row="0" Grid.Column="2" Text="Y:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="YEntry" Grid.Row="0" Grid.Column="3" Text="40" Keyboard="Numeric" WidthRequest="60" />
+
+            <Label Grid.Row="1" Grid.Column="0" Text="Font:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="FontEntry" Grid.Row="1" Grid.Column="1" Text="4" Keyboard="Numeric" WidthRequest="60" />
+            <Label Grid.Row="1" Grid.Column="2" Text="FontSize:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="FontSizeEntry" Grid.Row="1" Grid.Column="3" Text="0" Keyboard="Numeric" WidthRequest="60" />
+          </Grid>
+          <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
+            <Label Grid.Row="0" Grid.Column="0" Text="LineHeight:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="LineHeightEntry" Grid.Row="0" Grid.Column="1" Text="40" Keyboard="Numeric" WidthRequest="60" />
+            <Label Grid.Row="0" Grid.Column="2" Text="FeedLines:" FontSize="14" VerticalOptions="Center" />
+            <Entry x:Name="FeedLinesEntry" Grid.Row="0" Grid.Column="3" Text="5" Keyboard="Numeric" WidthRequest="60" />
+          </Grid>
         </VerticalStackLayout>
       </Frame>
 
@@ -427,7 +464,11 @@
             IsReadOnly="True"
             Text="Bluetooth Printer Sample App Started...&#x0a;"
             TextColor="{AppThemeBinding Light=#333333,
-                                        Dark=#FFFFFF}" />
+                                        Dark=#FFFFFF}">
+            <Editor.GestureRecognizers>
+              <TapGestureRecognizer Tapped="OnLogEditorTapped" />
+            </Editor.GestureRecognizers>
+          </Editor>
         </VerticalStackLayout>
       </Frame>
 

@@ -18,6 +18,13 @@ public partial class MainPage : ContentPage, IDisposable
     private readonly List<BluetoothDeviceModel> _discoveredDevices = new();
     private BluetoothDeviceModel? _connectedDevice;
     private bool _disposed;
+    private int _feedLines = 5; // Kullanıcı arayüzünden değiştirilebilir
+    private int _barcodeFont = 4;
+    private int _barcodeFontSize = 0;
+    private bool _barcodeLabelAbove = false;
+    private int _qrFont = 4;
+    private int _qrFontSize = 0;
+    private int _qrLabelYOffset = -60;
 
     public MainPage(BluetoothPrinterManager printerManager)
     {
@@ -191,34 +198,39 @@ public partial class MainPage : ContentPage, IDisposable
         }
     }
 
+    private int GetIntFromEntry(Entry entry, int defaultValue)
+    {
+        if (entry == null || string.IsNullOrWhiteSpace(entry.Text)) return defaultValue;
+        if (int.TryParse(entry.Text, out int value)) return value;
+        return defaultValue;
+    }
+
     private async void OnPrintTextClicked(object sender, EventArgs e)
     {
         if (_connectedDevice == null) return;
-
         try
         {
             PrintTextButton.IsEnabled = false;
             var text = PrintTextEntry.Text?.Trim();
-            
             if (string.IsNullOrEmpty(text))
             {
                 await DisplayAlert("Input Required", "Please enter text to print.", "OK");
                 return;
             }
-
+            int x = GetIntFromEntry(XEntry, 30);
+            int y = GetIntFromEntry(YEntry, 40);
+            int font = GetIntFromEntry(FontEntry, 4);
+            int fontSize = GetIntFromEntry(FontSizeEntry, 0);
+            int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
             bool success;
             if (_connectedDevice.PrinterType == PrinterType.Zebra)
             {
-                // Zebra printer - create ZPL label
-                var zplLabel = ZebraUtils.GenerateTextLabel(text, 30);
-                success = await _printerManager.PrintZplLabelAsync(zplLabel);
+                success = await _printerManager.PrintZebraTextLabelAsync(text, x, y, font, fontSize, feedLines);
             }
             else
             {
-                // ESC/POS printer
                 success = await _printerManager.PrintTextAsync(text, TextAlignment.Center, true);
             }
-            
             if (success)
             {
                 LogMessage($"Text printed successfully: {text}");
@@ -244,31 +256,29 @@ public partial class MainPage : ContentPage, IDisposable
     private async void OnPrintBarcodeClicked(object sender, EventArgs e)
     {
         if (_connectedDevice == null) return;
-
         try
         {
             PrintBarcodeButton.IsEnabled = false;
             var barcodeData = BarcodeEntry.Text?.Trim();
-            
             if (string.IsNullOrEmpty(barcodeData))
             {
                 await DisplayAlert("Input Required", "Please enter barcode data.", "OK");
                 return;
             }
-
+            int x = GetIntFromEntry(XEntry, 30);
+            int y = GetIntFromEntry(YEntry, 40);
+            int font = GetIntFromEntry(FontEntry, 4);
+            int fontSize = GetIntFromEntry(FontSizeEntry, 0);
+            int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
             bool success;
             if (_connectedDevice.PrinterType == PrinterType.Zebra)
             {
-                // Zebra printer - create ZPL barcode label
-                var zplLabel = ZebraUtils.GenerateBarcodeLabel(barcodeData, $"Barcode: {barcodeData}");
-                success = await _printerManager.PrintZplLabelAsync(zplLabel);
+                success = await _printerManager.PrintZebraBarcodeLabelAsync(barcodeData, $"Barcode: {barcodeData}", x, y, 128, 50, 1, font, fontSize, false, feedLines);
             }
             else
             {
-                // ESC/POS printer
                 success = await _printerManager.PrintBarcodeAsync(barcodeData, BarcodeType.Code128);
             }
-            
             if (success)
             {
                 LogMessage($"Barcode printed successfully: {barcodeData}");
@@ -294,31 +304,31 @@ public partial class MainPage : ContentPage, IDisposable
     private async void OnPrintQrCodeClicked(object sender, EventArgs e)
     {
         if (_connectedDevice == null) return;
-
         try
         {
             PrintQrCodeButton.IsEnabled = false;
             var qrData = QrCodeEntry.Text?.Trim();
-            
             if (string.IsNullOrEmpty(qrData))
             {
                 await DisplayAlert("Input Required", "Please enter QR code data.", "OK");
                 return;
             }
-
+            int x = GetIntFromEntry(XEntry, 50);
+            int y = GetIntFromEntry(YEntry, 100);
+            int font = GetIntFromEntry(FontEntry, 4);
+            int fontSize = GetIntFromEntry(FontSizeEntry, 0);
+            int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
+            int labelYOffset = -60;
+            int.TryParse(LineHeightEntry?.Text, out int lineHeight); // opsiyonel, receipt için kullanılacak
             bool success;
             if (_connectedDevice.PrinterType == PrinterType.Zebra)
             {
-                // Zebra printer - create ZPL QR code label
-                var zplLabel = ZebraUtils.GenerateQrCodeLabel(qrData, $"QR Code: {qrData}");
-                success = await _printerManager.PrintZplLabelAsync(zplLabel);
+                success = await _printerManager.PrintZebraQrLabelAsync(qrData, $"QR Code: {qrData}", x, y, 2, "M", font, fontSize, labelYOffset, feedLines);
             }
             else
             {
-                // ESC/POS printer
                 success = await _printerManager.PrintQrCodeAsync(qrData);
             }
-            
             if (success)
             {
                 LogMessage($"QR code printed successfully: {qrData}");
@@ -659,6 +669,28 @@ public partial class MainPage : ContentPage, IDisposable
     private void OnClearLogClicked(object sender, EventArgs e)
     {
         LogEditor.Text = string.Empty;
+    }
+
+    private async void OnLogEditorTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(LogEditor.Text))
+            {
+                await Clipboard.SetTextAsync(LogEditor.Text);
+                LogMessage("📋 Activity log copied to clipboard");
+                await DisplayAlert("Copied", "Activity log has been copied to clipboard", "OK");
+            }
+            else
+            {
+                await DisplayAlert("Empty Log", "No activity log to copy", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogMessage($"[EXCEPTION] Failed to copy log: {ex.Message}");
+            await DisplayAlert("Copy Error", $"Failed to copy log to clipboard: {ex.Message}", "OK");
+        }
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionStateChangedEventArgs e)
