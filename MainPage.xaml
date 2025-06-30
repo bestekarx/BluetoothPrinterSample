@@ -264,8 +264,13 @@
                                           Dark=#FFFFFF}" />
             <Entry
               x:Name="BarcodeEntry"
-              Placeholder="Enter barcode data..."
+              Placeholder="Enter barcode data (e.g., 123456789, ABC123)"
               Text="123456789" />
+            <Label
+              FontSize="10"
+              Text="Supports: Code128, Code39, EAN-13 (12 digits), EAN-8 (7 digits)"
+              TextColor="{AppThemeBinding Light=#666666,
+                                          Dark=#CCCCCC}" />
           </VerticalStackLayout>
 
           <!--  QR Code Input  -->
@@ -277,8 +282,13 @@
                                           Dark=#FFFFFF}" />
             <Entry
               x:Name="QrCodeEntry"
-              Placeholder="Enter QR code data..."
+              Placeholder="Enter QR code data (e.g., https://example.com)"
               Text="https://example.com" />
+            <Label
+              FontSize="10"
+              Text="Supports: URLs, text, phone numbers, email addresses"
+              TextColor="{AppThemeBinding Light=#666666,
+                                          Dark=#CCCCCC}" />
           </VerticalStackLayout>
         </VerticalStackLayout>
       </Frame>

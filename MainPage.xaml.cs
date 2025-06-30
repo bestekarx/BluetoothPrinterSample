@@ -256,44 +256,53 @@ public partial class MainPage : ContentPage, IDisposable
     private async void OnPrintBarcodeClicked(object sender, EventArgs e)
     {
         if (_connectedDevice == null) return;
+        
+        var barcodeData = BarcodeEntry.Text?.Trim();
+        if (string.IsNullOrEmpty(barcodeData))
+        {
+            await DisplayAlert("Hata", "Barcode verisi giriniz", "Tamam");
+            return;
+        }
+
         try
         {
             PrintBarcodeButton.IsEnabled = false;
-            var barcodeData = BarcodeEntry.Text?.Trim();
-            if (string.IsNullOrEmpty(barcodeData))
-            {
-                await DisplayAlert("Input Required", "Please enter barcode data.", "OK");
-                return;
-            }
-            int x = GetIntFromEntry(XEntry, 30);
-            int y = GetIntFromEntry(YEntry, 40);
-            int font = GetIntFromEntry(FontEntry, 4);
-            int fontSize = GetIntFromEntry(FontSizeEntry, 0);
-            int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
-            bool success;
+            
+            bool success = false;
+            
             if (_connectedDevice.PrinterType == PrinterType.Zebra)
             {
-                success = await _printerManager.PrintZebraBarcodeLabelAsync(barcodeData, $"Barcode: {barcodeData}", x, y, 128, 50, 1, font, fontSize, false, feedLines);
+                // Zebra printer için ZPL kullan
+                int x = GetIntFromEntry(XEntry, 50);
+                int y = GetIntFromEntry(YEntry, 100);
+                int font = GetIntFromEntry(FontEntry, 4);
+                int fontSize = GetIntFromEntry(FontSizeEntry, 0);
+                int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
+                bool labelAbove = _barcodeLabelAbove;
+                
+                success = await _printerManager.PrintZebraBarcodeLabelAsync(barcodeData, $"Barcode: {barcodeData}", x, y, 128, 50, 1, font, fontSize, labelAbove, feedLines);
             }
             else
             {
-                success = await _printerManager.PrintBarcodeAsync(barcodeData, BarcodeType.Code128);
+                // ESC/POS printer için yeni metodu kullan
+                success = await _printerManager.PrintSimpleBarcodeAsync(barcodeData, BarcodeType.Code128);
             }
+
             if (success)
             {
                 LogMessage($"Barcode printed successfully: {barcodeData}");
-                await DisplayAlert("Success", "Barcode printed successfully!", "OK");
+                await DisplayAlert("Başarılı", "Barcode yazdırıldı", "Tamam");
             }
             else
             {
                 LogMessage("Failed to print barcode");
-                await DisplayAlert("Print Error", "Failed to print barcode. Please check printer connection.", "OK");
+                await DisplayAlert("Hata", "Barcode yazdırılamadı", "Tamam");
             }
         }
         catch (Exception ex)
         {
             LogMessage($"[EXCEPTION] Print barcode error: {ex.Message}");
-            await DisplayAlert("Print Error", $"Error printing barcode: {ex.Message}", "OK");
+            await DisplayAlert("Hata", $"Barcode yazdırma hatası: {ex.Message}", "Tamam");
         }
         finally
         {
@@ -304,46 +313,66 @@ public partial class MainPage : ContentPage, IDisposable
     private async void OnPrintQrCodeClicked(object sender, EventArgs e)
     {
         if (_connectedDevice == null) return;
+        
+        var qrData = QrCodeEntry.Text?.Trim();
+        if (string.IsNullOrEmpty(qrData))
+        {
+            await DisplayAlert("Hata", "QR kod verisi giriniz", "Tamam");
+            return;
+        }
+
         try
         {
             PrintQrCodeButton.IsEnabled = false;
-            var qrData = QrCodeEntry.Text?.Trim();
-            if (string.IsNullOrEmpty(qrData))
-            {
-                await DisplayAlert("Input Required", "Please enter QR code data.", "OK");
-                return;
-            }
-            int x = GetIntFromEntry(XEntry, 50);
-            int y = GetIntFromEntry(YEntry, 100);
-            int font = GetIntFromEntry(FontEntry, 4);
-            int fontSize = GetIntFromEntry(FontSizeEntry, 0);
-            int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
-            int labelYOffset = -60;
-            int.TryParse(LineHeightEntry?.Text, out int lineHeight); // opsiyonel, receipt için kullanılacak
-            bool success;
+            
+            bool success = false;
+            
             if (_connectedDevice.PrinterType == PrinterType.Zebra)
             {
+                // Zebra printer için ZPL kullan
+                int x = GetIntFromEntry(XEntry, 50);
+                int y = GetIntFromEntry(YEntry, 100);
+                int font = GetIntFromEntry(FontEntry, 4);
+                int fontSize = GetIntFromEntry(FontSizeEntry, 0);
+                int feedLines = GetIntFromEntry(FeedLinesEntry, 5);
+                int labelYOffset = -60;
+                
                 success = await _printerManager.PrintZebraQrLabelAsync(qrData, $"QR Code: {qrData}", x, y, 2, "M", font, fontSize, labelYOffset, feedLines);
             }
             else
             {
-                success = await _printerManager.PrintQrCodeAsync(qrData);
+                // ESC/POS printer için yeni metodları dene
+                // Önce basit metodu dene
+                success = await _printerManager.PrintQrCodeVerySimpleAsync(qrData, 4);
+                
+                if (!success)
+                {
+                    // Basit metot başarısız olursa alternatif metodu dene
+                    success = await _printerManager.PrintQrCodeAlternativeAsync(qrData, 6);
+                }
+                
+                if (!success)
+                {
+                    // Son olarak normal metodu dene
+                    success = await _printerManager.PrintQrCodeAsync(qrData, 6);
+                }
             }
+
             if (success)
             {
                 LogMessage($"QR code printed successfully: {qrData}");
-                await DisplayAlert("Success", "QR code printed successfully!", "OK");
+                await DisplayAlert("Başarılı", "QR kod yazdırıldı", "Tamam");
             }
             else
             {
                 LogMessage("Failed to print QR code");
-                await DisplayAlert("Print Error", "Failed to print QR code. Please check printer connection.", "OK");
+                await DisplayAlert("Hata", "QR kod yazdırılamadı", "Tamam");
             }
         }
         catch (Exception ex)
         {
             LogMessage($"[EXCEPTION] Print QR code error: {ex.Message}");
-            await DisplayAlert("Print Error", $"Error printing QR code: {ex.Message}", "OK");
+            await DisplayAlert("Hata", $"QR kod yazdırma hatası: {ex.Message}", "Tamam");
         }
         finally
         {
@@ -482,6 +511,52 @@ public partial class MainPage : ContentPage, IDisposable
                     },
                     new PrintDataModel
                     {
+                        Type = PrintDataType.Text,
+                        Content = "Receipt ID: 12345",
+                        Alignment = TextAlignment.Center,
+                        FontSize = 10
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.LineBreak,
+                        Content = ""
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.Barcode,
+                        Content = "12345",
+                        BarcodeType = BarcodeType.Code128
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.LineBreak,
+                        Content = ""
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.Text,
+                        Content = "Scan for online receipt",
+                        Alignment = TextAlignment.Center,
+                        FontSize = 10
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.QrCode,
+                        Content = "https://receipt.example.com/12345",
+                        QrErrorLevel = QrCodeErrorLevel.M
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.LineBreak,
+                        Content = ""
+                    },
+                    new PrintDataModel
+                    {
+                        Type = PrintDataType.LineBreak,
+                        Content = ""
+                    },
+                    new PrintDataModel
+                    {
                         Type = PrintDataType.Cut,
                         Content = ""
                     }
@@ -543,6 +618,34 @@ public partial class MainPage : ContentPage, IDisposable
                 {
                     await _printerManager.PrintTextAsync($"Date: {DateTime.Now:yyyy-MM-dd HH:mm:ss}", TextAlignment.Center);
                     await _printerManager.PrintTextAsync("This is a test print", TextAlignment.Center);
+                    await _printerManager.PrintLineBreakAsync(2);
+                    
+                    // Test barcode
+                    await _printerManager.PrintTextAsync("Test Barcode:", TextAlignment.Center);
+                    await _printerManager.PrintSimpleBarcodeAsync("123456789", BarcodeType.Code128);
+                    await _printerManager.PrintLineBreakAsync(2);
+                    
+                    // Test QR code - try different methods
+                    await _printerManager.PrintTextAsync("Test QR Code:", TextAlignment.Center);
+                    
+                    // Try very simple method first
+                    var qrSuccess = await _printerManager.PrintQrCodeVerySimpleAsync("https://www.example.com", 4);
+                    
+                    if (!qrSuccess)
+                    {
+                        // Try alternative method
+                        qrSuccess = await _printerManager.PrintQrCodeAlternativeAsync("https://www.example.com", 6);
+                    }
+                    
+                    if (!qrSuccess)
+                    {
+                        // Try regular method
+                        qrSuccess = await _printerManager.PrintQrCodeAsync("https://www.example.com", 6);
+                    }
+                    
+                    await _printerManager.PrintLineBreakAsync(2);
+                    
+                    await _printerManager.PrintTextAsync("Test completed!", TextAlignment.Center, true);
                     await _printerManager.PrintLineBreakAsync(3);
                     await _printerManager.CutPaperAsync();
                     
