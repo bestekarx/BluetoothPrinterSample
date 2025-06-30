@@ -4,7 +4,7 @@ This project is a comprehensive demo application showcasing the usage of the [Ma
 
 ## 📱 Demo Application
 
-![Bluetooth Printer Sample App](BluetoothPrinterSample/ex.gif)
+![ble](https://raw.githubusercontent.com/bestekarx/BluetoothPrinterSample/refs/heads/main/ex.gif)
 
 *Live demonstration of the Bluetooth Printer Sample App*
 
