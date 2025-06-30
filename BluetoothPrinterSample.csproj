@@ -61,4 +61,8 @@
 		<ProjectReference Include="../../Maui.Bluetooth.Utils/Maui.Bluetooth.Utils.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="obj\Debug\net8.0-android\" />
+	</ItemGroup>
+
 </Project> 
